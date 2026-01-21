@@ -9,6 +9,8 @@ import { DifficultyManager } from '../systems/DifficultyManager.js';
 export class PlayScene extends Phaser.Scene {
     constructor() {
         super({ key: 'PlayScene' });
+        this.difficultyLevel = 0;
+        this.lastDifficultyTime = 0;
     }
 
     create() {
@@ -78,9 +80,44 @@ export class PlayScene extends Phaser.Scene {
         // UI
         this.createUI();
 
+        // Create particle texture for worm collection
+        this.createParticleTexture();
+
+        // Create particle emitter for worm collection
+        this.createWormParticles();
+
+        // Track elapsed time for difficulty
+        this.elapsedTime = 0;
+
         console.log('Nest generated:', this.nestData.rooms.length, 'rooms');
         console.log('Worms spawned:', this.worms.getLength());
         console.log('Hornets spawned:', this.hornets.getLength());
+    }
+
+    createParticleTexture() {
+        // Create a small yellow/gold particle texture
+        const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+        graphics.fillStyle(0xFFD700); // Gold color
+        graphics.fillCircle(4, 4, 4);
+        graphics.generateTexture('particle', 8, 8);
+        graphics.destroy();
+    }
+
+    createWormParticles() {
+        // Create particle emitter for worm collection sparkles
+        this.collectParticles = this.add.particles(0, 0, 'particle', {
+            speed: { min: 50, max: 100 },
+            scale: { start: 0.5, end: 0 },
+            lifespan: 300,
+            blendMode: 'ADD',
+            tint: [0xFFFF00, 0xFFD700, 0xFFA500], // Yellow/gold colors
+            emitting: false
+        });
+        this.collectParticles.setDepth(50);
+    }
+
+    shakeCamera(intensity = 0.01, duration = 200) {
+        this.cameras.main.shake(duration, intensity);
     }
 
     spawnWorms() {
@@ -171,6 +208,10 @@ export class PlayScene extends Phaser.Scene {
     }
 
     collectWorm(wasp, worm) {
+        // Trigger particle effect at worm position
+        this.collectParticles.setPosition(worm.x, worm.y);
+        this.collectParticles.explode(Phaser.Math.Between(5, 10));
+
         wasp.addWorm();
         worm.collect();
 
@@ -288,12 +329,30 @@ export class PlayScene extends Phaser.Scene {
         }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
 
         // Difficulty display (below time)
-        this.difficultyText = this.add.text(CONFIG.GAME_WIDTH - 10, 50, '', {
+        this.difficultyDisplayText = this.add.text(CONFIG.GAME_WIDTH - 10, 50, '', {
             fontSize: '14px',
             fill: '#ff8800',
             backgroundColor: '#000000aa',
             padding: { x: 10, y: 5 }
         }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
+
+        // Create hunger bar background
+        this.hungerBarBg = this.add.rectangle(400, 25, 204, 24, 0x333333)
+            .setScrollFactor(0)
+            .setDepth(100);
+
+        // Create hunger bar fill
+        this.hungerBar = this.add.rectangle(300, 25, 200, 20, 0x00ff00)
+            .setScrollFactor(0)
+            .setDepth(100)
+            .setOrigin(0, 0.5);
+
+        // Hunger bar label
+        this.hungerLabel = this.add.text(400, 25, 'HUNGER', {
+            fontSize: '12px',
+            fill: '#ffffff',
+            fontStyle: 'bold'
+        }).setScrollFactor(0).setDepth(101).setOrigin(0.5);
 
         this.updateUI();
     }
@@ -301,14 +360,50 @@ export class PlayScene extends Phaser.Scene {
     updateUI() {
         this.uiText.setText([
             `Worms Carried: ${this.wasp.wormsCarried}`,
-            `Queen Hunger: ${this.queen.hunger.toFixed(1)}%`,
-            `Worms Remaining: ${this.worms.getLength()}`
+            `Worms Remaining: ${this.worms.getLength()}`,
+            `Difficulty: ${this.difficultyLevel}`
         ]);
 
         // Update time display
         if (this.difficultyManager) {
             this.timeText.setText(`Time: ${this.difficultyManager.getFormattedScore()}`);
-            this.difficultyText.setText(`Difficulty: ${this.difficultyManager.getDifficultyLevel()}`);
+            this.difficultyDisplayText.setText(`Difficulty: ${this.difficultyManager.getDifficultyLevel()}`);
+        }
+
+        // Update hunger bar
+        const hungerPercent = this.queen.hunger / 100;
+        this.hungerBar.setScale(hungerPercent, 1);
+
+        // Color based on hunger level
+        if (this.queen.hunger > 50) {
+            this.hungerBar.setFillStyle(0x00ff00); // Green
+        } else if (this.queen.hunger > 25) {
+            this.hungerBar.setFillStyle(0xffff00); // Yellow
+        } else {
+            this.hungerBar.setFillStyle(0xff0000); // Red
+        }
+
+        // Pulsing effect when hunger is low (< 25%)
+        if (this.queen.hunger < 25) {
+            if (!this.hungerPulsing) {
+                this.hungerPulsing = true;
+                this.hungerPulseTween = this.tweens.add({
+                    targets: [this.hungerBar, this.hungerBarBg],
+                    scaleY: 1.2,
+                    duration: 200,
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
+        } else {
+            if (this.hungerPulsing) {
+                this.hungerPulsing = false;
+                if (this.hungerPulseTween) {
+                    this.hungerPulseTween.stop();
+                    this.hungerBar.setScale(hungerPercent, 1);
+                    this.hungerBarBg.setScale(1, 1);
+                }
+            }
         }
     }
 
