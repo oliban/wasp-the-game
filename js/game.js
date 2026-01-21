@@ -19,3 +19,6 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
+// Expose game globally for testing
+window.gameInstance = game;
