@@ -19,6 +19,9 @@ export class Wasp extends Phaser.Physics.Arcade.Sprite {
 
         // Store reference to cursors (set by scene)
         this.cursors = null;
+
+        // Play flying animation
+        this.play('wasp-fly');
     }
 
     setCursors(cursors) {
