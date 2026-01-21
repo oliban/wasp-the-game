@@ -4,6 +4,7 @@ import { Queen } from '../entities/Queen.js';
 import { Worm } from '../entities/Worm.js';
 import { Hornet } from '../entities/Hornet.js';
 import { NestGenerator } from '../systems/NestGenerator.js';
+import { DifficultyManager } from '../systems/DifficultyManager.js';
 
 export class PlayScene extends Phaser.Scene {
     constructor() {
@@ -60,6 +61,20 @@ export class PlayScene extends Phaser.Scene {
         this.cameras.main.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
         this.cameras.main.startFollow(this.wasp, true, 0.1, 0.1);
 
+        // Initialize difficulty manager
+        this.difficultyManager = new DifficultyManager(this);
+
+        // Listen for difficulty increases
+        this.events.on('difficultyIncreased', this.onDifficultyIncreased, this);
+
+        // Worm respawn timer (every 10 seconds)
+        this.wormRespawnTimer = this.time.addEvent({
+            delay: 10000,
+            callback: this.respawnWorms,
+            callbackScope: this,
+            loop: true
+        });
+
         // UI
         this.createUI();
 
@@ -74,6 +89,85 @@ export class PlayScene extends Phaser.Scene {
             const worm = new Worm(this, point.x, point.y);
             this.worms.add(worm);
         }
+    }
+
+    respawnWorms() {
+        // Only respawn if below a certain threshold
+        const maxWorms = this.nestData.wormSpawnPoints.length;
+        const currentWorms = this.worms.getLength();
+
+        if (currentWorms < maxWorms) {
+            // Pick random spawn points
+            const availablePoints = [...this.nestData.wormSpawnPoints];
+            Phaser.Utils.Array.Shuffle(availablePoints);
+
+            // Try to respawn some worms based on difficulty
+            const wormsToSpawn = Math.min(3, maxWorms - currentWorms);
+
+            for (let i = 0; i < wormsToSpawn; i++) {
+                // Check respawn chance based on difficulty
+                if (this.difficultyManager.shouldSpawnWorm()) {
+                    const point = availablePoints[i];
+                    if (point) {
+                        const worm = new Worm(this, point.x, point.y);
+                        this.worms.add(worm);
+                    }
+                }
+            }
+        }
+    }
+
+    onDifficultyIncreased(data) {
+        // Increase queen's hunger drain rate
+        const newDrainRate = this.queen.drainRate + data.hungerDrainIncrease;
+        if (newDrainRate <= 10) { // Max drain rate cap
+            this.queen.increaseDrainRate(data.hungerDrainIncrease);
+        }
+
+        // Show difficulty increase notification
+        this.showDifficultyNotification(data.level);
+
+        console.log(`Difficulty level ${data.level}: Queen drain rate now ${this.queen.drainRate.toFixed(1)}`);
+    }
+
+    showDifficultyNotification(level) {
+        const notification = this.add.text(
+            CONFIG.GAME_WIDTH / 2,
+            CONFIG.GAME_HEIGHT / 2 - 50,
+            'DIFFICULTY INCREASED!',
+            {
+                fontSize: '32px',
+                fill: '#ff4444',
+                fontStyle: 'bold',
+                stroke: '#000000',
+                strokeThickness: 4
+            }
+        ).setOrigin(0.5).setScrollFactor(0).setDepth(200);
+
+        const levelText = this.add.text(
+            CONFIG.GAME_WIDTH / 2,
+            CONFIG.GAME_HEIGHT / 2,
+            `Level ${level}`,
+            {
+                fontSize: '24px',
+                fill: '#ffaa00',
+                stroke: '#000000',
+                strokeThickness: 3
+            }
+        ).setOrigin(0.5).setScrollFactor(0).setDepth(200);
+
+        // Animate and remove
+        this.tweens.add({
+            targets: [notification, levelText],
+            alpha: 0,
+            y: '-=30',
+            duration: 2000,
+            ease: 'Power2',
+            onComplete: () => {
+                notification.destroy();
+                levelText.destroy();
+            }
+        });
     }
 
     collectWorm(wasp, worm) {
@@ -177,12 +271,29 @@ export class PlayScene extends Phaser.Scene {
     }
 
     createUI() {
+        // Main info panel (top left)
         this.uiText = this.add.text(10, 10, '', {
             fontSize: '16px',
             fill: '#ffffff',
             backgroundColor: '#000000aa',
             padding: { x: 10, y: 5 }
         }).setScrollFactor(0).setDepth(100);
+
+        // Time/Score display (top right)
+        this.timeText = this.add.text(CONFIG.GAME_WIDTH - 10, 10, '', {
+            fontSize: '18px',
+            fill: '#ffff00',
+            backgroundColor: '#000000aa',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
+
+        // Difficulty display (below time)
+        this.difficultyText = this.add.text(CONFIG.GAME_WIDTH - 10, 50, '', {
+            fontSize: '14px',
+            fill: '#ff8800',
+            backgroundColor: '#000000aa',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
 
         this.updateUI();
     }
@@ -193,11 +304,22 @@ export class PlayScene extends Phaser.Scene {
             `Queen Hunger: ${this.queen.hunger.toFixed(1)}%`,
             `Worms Remaining: ${this.worms.getLength()}`
         ]);
+
+        // Update time display
+        if (this.difficultyManager) {
+            this.timeText.setText(`Time: ${this.difficultyManager.getFormattedScore()}`);
+            this.difficultyText.setText(`Difficulty: ${this.difficultyManager.getDifficultyLevel()}`);
+        }
     }
 
     gameOver() {
         console.log('Game Over - Queen starved!');
-        this.scene.start('GameOverScene', { reason: 'starved' });
+        this.scene.start('GameOverScene', {
+            reason: 'starved',
+            score: this.difficultyManager.getScore(),
+            formattedScore: this.difficultyManager.getFormattedScore(),
+            difficultyLevel: this.difficultyManager.getDifficultyLevel()
+        });
     }
 
     update(time, delta) {
@@ -205,6 +327,9 @@ export class PlayScene extends Phaser.Scene {
 
         // Update queen hunger
         this.queen.update(delta);
+
+        // Update difficulty manager
+        this.difficultyManager.update(delta);
 
         // Update UI
         this.updateUI();
