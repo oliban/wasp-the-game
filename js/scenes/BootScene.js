@@ -60,7 +60,7 @@ export class BootScene extends Phaser.Scene {
         // Hornet patrol animation (8 fps - casual movement)
         this.anims.create({
             key: 'hornet-patrol',
-            frames: this.anims.generateFrameNumbers('hornet', { start: 0, end: 3 }),
+            frames: this.anims.generateFrameNumbers('hornet', { start: 0, end: 1 }),
             frameRate: 8,
             repeat: -1
         });
@@ -68,7 +68,7 @@ export class BootScene extends Phaser.Scene {
         // Hornet chase animation (12 fps - aggressive, faster)
         this.anims.create({
             key: 'hornet-chase',
-            frames: this.anims.generateFrameNumbers('hornet', { start: 0, end: 3 }),
+            frames: this.anims.generateFrameNumbers('hornet', { start: 2, end: 3 }),
             frameRate: 12,
             repeat: -1
         });
