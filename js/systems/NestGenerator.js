@@ -69,7 +69,7 @@ export class NestGenerator {
         this.shuffleArray(directions);
 
         for (const dir of directions) {
-            // Decrease probability with depth
+            // Decrease probability with depth - branch if random is LESS than probability
             const probability = CONFIG.BRANCH_PROBABILITY * (1 - room.depth * 0.1);
             if (Math.random() > probability) continue;
 
@@ -120,8 +120,8 @@ export class NestGenerator {
 
         const corridor = this.createRoom(x, y, width, height, 'corridor', fromRoom.depth);
 
-        // Check for overlaps
-        if (this.overlapsExisting(corridor)) return null;
+        // Check for overlaps (excluding the room we're extending from)
+        if (this.overlapsExisting(corridor, [fromRoom.id])) return null;
 
         this.rooms.push(corridor);
         return corridor;
