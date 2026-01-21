@@ -4,7 +4,7 @@ export class DifficultyManager {
     constructor(scene) {
         this.scene = scene;
         this.elapsedTime = 0;
-        this.difficultyLevel = 1;
+        this.difficultyLevel = 0;
         this.lastDifficultyTime = 0;
 
         // Difficulty caps
@@ -13,7 +13,7 @@ export class DifficultyManager {
         this.minWormRespawnChance = 0.2;
 
         // Current values
-        this.currentWormRespawnChance = 1.0;
+        this.currentWormRespawnChance = 0.5; // 50% base chance as per spec
         this.hornetsSpawned = 0;
     }
 
@@ -37,6 +37,11 @@ export class DifficultyManager {
             enemySpawnIncrease: CONFIG.ENEMY_SPAWN_INCREASE
         });
 
+        // Spawn additional hornet (if hornets system is available)
+        if (this.canSpawnMoreHornets()) {
+            this.spawnNewHornet();
+        }
+
         // Reduce worm respawn chance
         this.currentWormRespawnChance = Math.max(
             this.minWormRespawnChance,
@@ -44,6 +49,45 @@ export class DifficultyManager {
         );
 
         console.log(`Difficulty increased to level ${this.difficultyLevel}`);
+    }
+
+    spawnNewHornet() {
+        // Check if hornets system exists in scene (Phase 5)
+        if (!this.scene.hornets || !this.scene.nestData || !this.scene.Hornet) {
+            console.log('Hornet spawning not available - hornets system not initialized');
+            return;
+        }
+
+        // Filter rooms to exclude queen room and corridors
+        const rooms = this.scene.nestData.rooms.filter(
+            r => r.type !== 'queen' && r.type !== 'corridor'
+        );
+
+        if (rooms.length === 0) {
+            console.log('No suitable rooms for hornet spawn');
+            return;
+        }
+
+        // Pick random room
+        const room = Phaser.Utils.Array.GetRandom(rooms);
+
+        // Create new hornet using the Hornet class reference stored in scene
+        const hornet = new this.scene.Hornet(
+            this.scene,
+            room.centerX,
+            room.centerY,
+            room
+        );
+
+        // Set target to wasp if available
+        if (this.scene.wasp) {
+            hornet.setTarget(this.scene.wasp);
+        }
+
+        this.scene.hornets.add(hornet);
+        this.recordHornetSpawn();
+
+        console.log(`Spawned new hornet in room at (${room.centerX}, ${room.centerY})`);
     }
 
     getScore() {
