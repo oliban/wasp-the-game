@@ -44,7 +44,7 @@ export class PlayScene extends Phaser.Scene {
         this.physics.add.overlap(this.wasp, this.queen.feedZone, this.feedQueen, null, this);
 
         // Create hornets
-        this.hornets = this.physics.add.group();
+        this.hornets = this.physics.add.group({ runChildUpdate: true });
         this.spawnHornets();
 
         // Hornet-wasp collision
@@ -205,11 +205,6 @@ export class PlayScene extends Phaser.Scene {
 
         // Update queen hunger
         this.queen.update(delta);
-
-        // Update hornets
-        this.hornets.getChildren().forEach(hornet => {
-            hornet.update(time, delta);
-        });
 
         // Update UI
         this.updateUI();
