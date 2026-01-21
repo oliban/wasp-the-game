@@ -12,6 +12,11 @@ export class Wasp extends Phaser.Physics.Arcade.Sprite {
         this.wormsCarried = 0;
         this.baseMaxVelocity = CONFIG.WASP_MAX_VELOCITY;
 
+        // Invincibility
+        this.invincible = false;
+        this.invincibilityDuration = 1500; // 1.5 seconds
+        this.flashTween = null;
+
         // Configure physics body
         this.body.setDrag(CONFIG.WASP_DRAG);
         this.body.setMaxVelocity(this.baseMaxVelocity);
@@ -73,5 +78,33 @@ export class Wasp extends Phaser.Physics.Arcade.Sprite {
         const dropped = this.wormsCarried;
         this.wormsCarried = 0;
         return dropped;
+    }
+
+    makeInvincible() {
+        if (this.invincible) return;
+
+        this.invincible = true;
+
+        // Flashing effect
+        this.flashTween = this.scene.tweens.add({
+            targets: this,
+            alpha: { from: 1, to: 0.3 },
+            duration: 100,
+            yoyo: true,
+            repeat: 7 // ~1.5 seconds
+        });
+
+        // End invincibility after duration
+        this.scene.time.delayedCall(this.invincibilityDuration, () => {
+            this.invincible = false;
+            this.alpha = 1;
+            if (this.flashTween) {
+                this.flashTween.stop();
+            }
+        });
+    }
+
+    isInvincible() {
+        return this.invincible;
     }
 }
