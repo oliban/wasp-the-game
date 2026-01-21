@@ -16,6 +16,9 @@ export class Queen extends Phaser.GameObjects.Sprite {
         // Create overlap zone (larger than sprite for easier feeding)
         this.feedZone = scene.add.zone(x, y, CONFIG.QUEEN_SIZE * 1.5, CONFIG.QUEEN_SIZE * 1.5);
         scene.physics.add.existing(this.feedZone, true); // Static body
+
+        // Play idle animation
+        this.play('queen-idle');
     }
 
     createHungerBar() {
