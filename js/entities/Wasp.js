@@ -11,6 +11,7 @@ export class Wasp extends Phaser.Physics.Arcade.Sprite {
 
         this.body.setDrag(CONFIG.WASP_DRAG);
         this.body.setMaxVelocity(this.baseMaxVelocity);
+        this.body.setCollideWorldBounds(true);
         this.cursors = null;
     }
 
