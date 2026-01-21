@@ -1,0 +1,514 @@
+{
+  "features": [
+    {
+      "id": "SETUP-001",
+      "title": "Create HTML entry point with Phaser 3 CDN",
+      "priority": "P0",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create index.html that loads Phaser 3 from CDN, sets up centered canvas with black background, loads game JS as ES6 modules"
+    },
+    {
+      "id": "SETUP-002",
+      "title": "Create Phaser game configuration",
+      "priority": "P0",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/game.js with 800x600 canvas, Arcade physics (no gravity), scene registration"
+    },
+    {
+      "id": "SETUP-003",
+      "title": "Create game constants configuration",
+      "priority": "P0",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/config.js with CONFIG object containing all game constants (speeds, rates, sizes, colors)"
+    },
+    {
+      "id": "SETUP-004",
+      "title": "Create BootScene with placeholder sprites",
+      "priority": "P0",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/scenes/BootScene.js that generates colored rectangle placeholders for all entities"
+    },
+    {
+      "id": "SETUP-005",
+      "title": "Create PlayScene with basic setup",
+      "priority": "P0",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/scenes/PlayScene.js with placeholder sprite, arrow key input logging, physics confirmation"
+    },
+    {
+      "id": "SETUP-006",
+      "title": "Create GameOverScene placeholder",
+      "priority": "P0",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/scenes/GameOverScene.js with Game Over text and SPACE to restart"
+    },
+    {
+      "id": "MOVE-001",
+      "title": "Create Wasp entity class with movement",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/entities/Wasp.js extending Phaser.Physics.Arcade.Sprite with momentum-based movement, drag, max velocity"
+    },
+    {
+      "id": "MOVE-002",
+      "title": "Implement floaty momentum physics",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Implement acceleration (300 px/sec^2), drag (100), max velocity (200 px/sec), diagonal movement support"
+    },
+    {
+      "id": "MOVE-003",
+      "title": "Add speed penalty system for worms",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Track wormsCarried, reduce max velocity by WASP_WORM_SPEED_PENALTY per worm, minimum velocity 50"
+    },
+    {
+      "id": "MOVE-004",
+      "title": "Setup camera follow system",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Configure camera to follow wasp with lerp 0.1, set world bounds, create debug text display"
+    },
+    {
+      "id": "NEST-001",
+      "title": "Create NestGenerator system",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/systems/NestGenerator.js with room data structure (id, position, size, type, depth, connections)"
+    },
+    {
+      "id": "NEST-002",
+      "title": "Implement queen chamber creation",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create queen's chamber at world center with type 'queen', depth 0, large room size"
+    },
+    {
+      "id": "NEST-003",
+      "title": "Implement recursive room expansion",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Add corridors in 4 directions with BRANCH_PROBABILITY (60%), decreasing with depth, max depth 5"
+    },
+    {
+      "id": "NEST-004",
+      "title": "Create corridor and room placement",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create corridors (64px wide, 100-200px long) and rooms (200-400px) with overlap detection"
+    },
+    {
+      "id": "NEST-005",
+      "title": "Add worm spawn point placement",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Calculate worm count per room based on depth, no worms in queen chamber"
+    },
+    {
+      "id": "NEST-006",
+      "title": "Generate tilemap with collision",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Convert room data to Phaser tilemap, create wall/floor layers, set collision on walls"
+    },
+    {
+      "id": "NEST-007",
+      "title": "Integrate NestGenerator in PlayScene",
+      "priority": "P1",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Use NestGenerator, set world bounds from generated nest, add wasp-wall collision"
+    },
+    {
+      "id": "QUEEN-001",
+      "title": "Create Queen entity with hunger system",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/entities/Queen.js with hunger property (0-100), drain rate, feed zone"
+    },
+    {
+      "id": "QUEEN-002",
+      "title": "Implement hunger bar UI",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create bar above queen - green >50%, yellow 25-50%, red <25%, shows percentage"
+    },
+    {
+      "id": "QUEEN-003",
+      "title": "Create Worm collectible entity",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/entities/Worm.js with physics body, wiggle animation, collect method"
+    },
+    {
+      "id": "QUEEN-004",
+      "title": "Implement worm collection mechanic",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Wasp overlaps worm -> destroy worm, increment wormsCarried, update UI"
+    },
+    {
+      "id": "QUEEN-005",
+      "title": "Implement queen feeding mechanic",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Wasp overlaps queen with worms -> transfer all, restore hunger, visual feedback"
+    },
+    {
+      "id": "QUEEN-006",
+      "title": "Implement game over on starvation",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Queen hunger <= 0 triggers queenDied event, transition to GameOverScene"
+    },
+    {
+      "id": "QUEEN-007",
+      "title": "Spawn queen and worms in PlayScene",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create queen in queen chamber, spawn worms at spawn points, create UI overlay"
+    },
+    {
+      "id": "HORNET-001",
+      "title": "Create Hornet entity with AI states",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/entities/Hornet.js with FSM: PATROL, CHASE, RETURN states"
+    },
+    {
+      "id": "HORNET-002",
+      "title": "Implement patrol behavior",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Move back/forth in room, random direction, reverse at boundaries, 80 px/sec"
+    },
+    {
+      "id": "HORNET-003",
+      "title": "Implement chase behavior",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Trigger on detection (150px), move toward wasp at 120 px/sec, 5 second timeout"
+    },
+    {
+      "id": "HORNET-004",
+      "title": "Implement return behavior",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Return to home position at 100 px/sec, transition to patrol when near"
+    },
+    {
+      "id": "HORNET-005",
+      "title": "Implement detection system",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Distance check each frame, 150px radius, only detect if wasp in same room"
+    },
+    {
+      "id": "HORNET-006",
+      "title": "Implement collision and worm drop",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Wasp hits hornet -> drop all worms scattered, 1.5s invincibility, hornet returns"
+    },
+    {
+      "id": "HORNET-007",
+      "title": "Add wasp invincibility system",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Add invincible flag to Wasp, flashing effect, 1.5 second duration"
+    },
+    {
+      "id": "HORNET-008",
+      "title": "Spawn hornets in PlayScene",
+      "priority": "P2",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Spawn 1-2 hornets per room based on depth, not in queen chamber, set up collisions"
+    },
+    {
+      "id": "DIFF-001",
+      "title": "Create DifficultyManager system",
+      "priority": "P3",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Create js/systems/DifficultyManager.js tracking elapsed time, difficulty level, scaling values"
+    },
+    {
+      "id": "DIFF-002",
+      "title": "Implement scoring system",
+      "priority": "P3",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Score = survival seconds, display as MM:SS, pass to GameOverScene"
+    },
+    {
+      "id": "DIFF-003",
+      "title": "Implement difficulty scaling triggers",
+      "priority": "P3",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Every 45s: increase hunger drain +0.5%/sec, spawn hornet, reduce worm respawn chance"
+    },
+    {
+      "id": "DIFF-004",
+      "title": "Implement dynamic hornet spawning",
+      "priority": "P3",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "On difficulty increase, spawn new hornet in random non-queen room, max 20"
+    },
+    {
+      "id": "DIFF-005",
+      "title": "Implement worm respawning",
+      "priority": "P3",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Check every 10s, chance to respawn at empty spawn points, chance decreases with difficulty"
+    },
+    {
+      "id": "DIFF-006",
+      "title": "Complete GameOverScene implementation",
+      "priority": "P3",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Display final score, death reason, high score (localStorage), restart via SPACE/click"
+    },
+    {
+      "id": "ART-001",
+      "title": "Create wasp sprite sheet (32x32, 4 frames)",
+      "priority": "P4",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Yellow body, black stripes, translucent wings, top-down view, wing flutter animation"
+    },
+    {
+      "id": "ART-002",
+      "title": "Create queen sprite sheet (64x64, 4 frames)",
+      "priority": "P4",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Larger body, crown marking, breathing animation, regal centered posture"
+    },
+    {
+      "id": "ART-003",
+      "title": "Create hornet sprite sheet (32x32, 4 frames)",
+      "priority": "P4",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Brown/orange body, angry expression, patrol and chase animation variants"
+    },
+    {
+      "id": "ART-004",
+      "title": "Create worm sprite sheet (16x16, 4 frames)",
+      "priority": "P4",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Pink segmented body, dot eyes, wiggle animation"
+    },
+    {
+      "id": "ART-005",
+      "title": "Create wall and floor tile sprites",
+      "priority": "P4",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "16x16 honeycomb pattern tiles, wall amber/brown, floor darker, seamless tiling"
+    },
+    {
+      "id": "ART-006",
+      "title": "Update BootScene for sprite loading",
+      "priority": "P4",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Load sprite sheets, create animations (wasp-fly, queen-idle, hornet-patrol/chase, worm-wiggle)"
+    },
+    {
+      "id": "ART-007",
+      "title": "Integrate animations in entities",
+      "priority": "P4",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Play animations in Wasp, Queen, Hornet, Worm constructors, switch hornet animation on state"
+    },
+    {
+      "id": "POLISH-001",
+      "title": "Create TitleScene with title image",
+      "priority": "P5",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Load wasp-the-game.png as background, add start prompt, display high score"
+    },
+    {
+      "id": "POLISH-002",
+      "title": "Add sound effects",
+      "priority": "P5",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Load and play buzz, pickup, feed, hit, alert, gameover sounds at appropriate triggers"
+    },
+    {
+      "id": "POLISH-003",
+      "title": "Add screen shake effects",
+      "priority": "P5",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Camera shake on hornet hit (0.01, 200ms), difficulty increase (0.005, 100ms)"
+    },
+    {
+      "id": "POLISH-004",
+      "title": "Add particle effects",
+      "priority": "P5",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Sparkles on worm collection, hearts on queen feeding, create particle emitters"
+    },
+    {
+      "id": "POLISH-005",
+      "title": "Add background music",
+      "priority": "P6",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Ambient hive loop, tension music at low hunger, cross-fade between tracks"
+    },
+    {
+      "id": "POLISH-006",
+      "title": "Polish UI elements",
+      "priority": "P6",
+      "status": {
+        "implemented": false,
+        "work_status": "open"
+      },
+      "description": "Pulsing hunger bar when low, worm icons, pop animations on value changes"
+    }
+  ]
+}
