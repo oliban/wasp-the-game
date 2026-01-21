@@ -1,4 +1,5 @@
 import { CONFIG } from '../config.js';
+import { Wasp } from '../entities/Wasp.js';
 
 export class PlayScene extends Phaser.Scene {
     constructor() {
@@ -6,32 +7,37 @@ export class PlayScene extends Phaser.Scene {
     }
 
     create() {
-        // Create placeholder wasp sprite in center
-        this.wasp = this.physics.add.sprite(
-            CONFIG.GAME_WIDTH / 2,
-            CONFIG.GAME_HEIGHT / 2,
-            'wasp'
-        );
+        const worldWidth = 2000;
+        const worldHeight = 2000;
+        this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
 
-        // Set up arrow key input
+        this.wasp = new Wasp(this, worldWidth / 2, worldHeight / 2);
+
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.wasp.setCursors(this.cursors);
 
-        // Debug text
-        this.debugText = this.add.text(10, 10, 'Phase 1: Setup Complete', {
-            fontSize: '16px',
-            fill: '#ffffff'
-        });
+        this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
+        this.cameras.main.startFollow(this.wasp, true, 0.1, 0.1);
 
-        console.log('PlayScene created successfully');
-        console.log('Wasp sprite:', this.wasp);
-        console.log('Cursors:', this.cursors);
+        this.debugText = this.add.text(10, 10, '', {
+            fontSize: '14px',
+            fill: '#ffffff',
+            backgroundColor: '#000000'
+        }).setScrollFactor(0).setDepth(100);
+
+        console.log('PlayScene created with Wasp entity');
     }
 
-    update() {
-        // Log arrow key presses (movement implemented in Phase 2)
-        if (this.cursors.left.isDown) console.log('Left pressed');
-        if (this.cursors.right.isDown) console.log('Right pressed');
-        if (this.cursors.up.isDown) console.log('Up pressed');
-        if (this.cursors.down.isDown) console.log('Down pressed');
+    update(time, delta) {
+        this.wasp.update();
+
+        const vel = this.wasp.body.velocity;
+        const maxVel = this.wasp.getMaxVelocity();
+        this.debugText.setText([
+            `Velocity: (${vel.x.toFixed(0)}, ${vel.y.toFixed(0)})`,
+            `Max Velocity: ${maxVel}`,
+            `Worms Carried: ${this.wasp.wormsCarried}`,
+            `Position: (${this.wasp.x.toFixed(0)}, ${this.wasp.y.toFixed(0)})`
+        ]);
     }
 }
