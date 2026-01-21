@@ -208,6 +208,9 @@ export class PlayScene extends Phaser.Scene {
     }
 
     collectWorm(wasp, worm) {
+        // Skip if worm already collected (prevents multiple triggers)
+        if (worm.collected) return;
+
         // Trigger particle effect at worm position
         this.collectParticles.setPosition(worm.x, worm.y);
         this.collectParticles.explode(Phaser.Math.Between(5, 10));

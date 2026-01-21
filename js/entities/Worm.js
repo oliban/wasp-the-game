@@ -10,11 +10,23 @@ export class Worm extends Phaser.Physics.Arcade.Sprite {
         // Make body slightly smaller than sprite for precise collision
         this.body.setSize(CONFIG.WORM_SIZE * 0.8, CONFIG.WORM_SIZE * 0.8);
 
+        // Track if worm has been collected (prevents multiple collection callbacks)
+        this.collected = false;
+
         // Play wiggle animation
         this.play('worm-wiggle');
     }
 
     collect() {
+        // Prevent multiple collection triggers
+        if (this.collected) return;
+        this.collected = true;
+
+        // Disable physics body immediately to prevent further overlap callbacks
+        if (this.body) {
+            this.body.enable = false;
+        }
+
         // Stop sprite animation
         this.stop();
 
