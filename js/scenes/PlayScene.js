@@ -2,6 +2,7 @@ import { CONFIG } from '../config.js';
 import { Wasp } from '../entities/Wasp.js';
 import { Queen } from '../entities/Queen.js';
 import { Worm } from '../entities/Worm.js';
+import { Hornet } from '../entities/Hornet.js';
 import { NestGenerator } from '../systems/NestGenerator.js';
 
 export class PlayScene extends Phaser.Scene {
@@ -42,6 +43,16 @@ export class PlayScene extends Phaser.Scene {
         // Queen feeding overlap
         this.physics.add.overlap(this.wasp, this.queen.feedZone, this.feedQueen, null, this);
 
+        // Create hornets
+        this.hornets = this.physics.add.group({ runChildUpdate: true });
+        this.spawnHornets();
+
+        // Hornet-wasp collision
+        this.physics.add.overlap(this.wasp, this.hornets, this.hornetHitWasp, null, this);
+
+        // Hornet-wall collision
+        this.physics.add.collider(this.hornets, this.nestData.wallLayer);
+
         // Queen death event
         this.events.on('queenDied', this.gameOver, this);
 
@@ -54,6 +65,7 @@ export class PlayScene extends Phaser.Scene {
 
         console.log('Nest generated:', this.nestData.rooms.length, 'rooms');
         console.log('Worms spawned:', this.worms.getLength());
+        console.log('Hornets spawned:', this.hornets.getLength());
     }
 
     spawnWorms() {
@@ -97,6 +109,71 @@ export class PlayScene extends Phaser.Scene {
 
         this.updateUI();
         console.log('Fed queen! Hunger:', this.queen.hunger.toFixed(1));
+    }
+
+    spawnHornets() {
+        for (const room of this.nestData.rooms) {
+            // Skip queen's chamber
+            if (room.type === 'queen') continue;
+            // Skip corridors
+            if (room.type === 'corridor') continue;
+
+            // Spawn based on depth (1-2 hornets)
+            const hornetCount = Math.min(room.depth, 2);
+            for (let i = 0; i < hornetCount; i++) {
+                const offsetX = (Math.random() - 0.5) * room.width * 0.5;
+                const offsetY = (Math.random() - 0.5) * room.height * 0.5;
+                const hornet = new Hornet(
+                    this,
+                    room.centerX + offsetX,
+                    room.centerY + offsetY,
+                    room
+                );
+                hornet.setTarget(this.wasp);
+                this.hornets.add(hornet);
+            }
+        }
+    }
+
+    hornetHitWasp(wasp, hornet) {
+        // Skip if invincible
+        if (wasp.isInvincible()) return;
+
+        // Drop worms
+        const droppedCount = wasp.dropAllWorms();
+        if (droppedCount > 0) {
+            this.scatterWorms(wasp.x, wasp.y, droppedCount);
+        }
+
+        // Make wasp invincible
+        wasp.makeInvincible();
+
+        // Hornet returns to patrol
+        hornet.onHitWasp();
+
+        console.log('Hit by hornet! Dropped', droppedCount, 'worms');
+    }
+
+    scatterWorms(x, y, count) {
+        for (let i = 0; i < count; i++) {
+            const worm = new Worm(this, x, y);
+            this.worms.add(worm);
+
+            // Random scatter velocity
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 100 + Math.random() * 100;
+            worm.body.setVelocity(
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed
+            );
+
+            // Stop after settling
+            this.time.delayedCall(500, () => {
+                if (worm.body) {
+                    worm.body.setVelocity(0, 0);
+                }
+            });
+        }
     }
 
     createUI() {
