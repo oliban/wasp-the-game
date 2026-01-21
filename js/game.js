@@ -1,4 +1,5 @@
 import { CONFIG } from './config.js';
+import { TitleScene } from './scenes/TitleScene.js';
 import { BootScene } from './scenes/BootScene.js';
 import { PlayScene } from './scenes/PlayScene.js';
 import { GameOverScene } from './scenes/GameOverScene.js';
@@ -15,7 +16,7 @@ const config = {
             debug: true  // Enable during development
         }
     },
-    scene: [BootScene, PlayScene, GameOverScene]
+    scene: [TitleScene, BootScene, PlayScene, GameOverScene]
 };
 
 const game = new Phaser.Game(config);
