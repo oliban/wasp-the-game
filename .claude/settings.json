@@ -1,0 +1,10 @@
+{
+  "skills": {
+    "imports": [
+      {
+        "source": "git@github.com:oliban/coordinator-skills.git",
+        "path": "skills"
+      }
+    ]
+  }
+}
